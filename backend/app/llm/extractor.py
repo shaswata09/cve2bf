@@ -120,18 +120,37 @@ class VLLMExtractor:
 
     def _parse(self, skeleton: ChainSkeleton, raw: dict) -> list[SlotValues]:
         """Convert the model's JSON into :class:`SlotValues`, filling gaps safely."""
-        items = raw.get("weaknesses", [])
+        items = raw.get("weaknesses", []) if isinstance(raw, dict) else []
         slots: list[SlotValues] = []
         for idx, slot in enumerate(skeleton.slots):
             cls = self._tax.get_class(slot.bf_class)
-            item = items[idx] if idx < len(items) else {}
+            item = items[idx] if (isinstance(items, list) and idx < len(items)) else {}
+            if not isinstance(item, dict):
+                item = {}
             operation = item.get("operation") or slot.allowed_operations[0]
             bug_cause = item.get("bug_cause") if slot.entry_cause_kind == "bug" else None
-            operands = [
-                Operand(name=o.get("name", "operand"), attributes=o.get("attributes", {}))
-                for o in item.get("operands", [])
-            ] or [Operand(name="operand", attributes={})]
-            op_attrs = item.get("operation_attributes", {})
+            
+            raw_operands = item.get("operands")
+            operands = []
+            if isinstance(raw_operands, list):
+                for o in raw_operands:
+                    if isinstance(o, dict):
+                        operands.append(
+                            Operand(
+                                name=o.get("name") or "operand",
+                                attributes=o.get("attributes") if isinstance(o.get("attributes"), dict) else {},
+                            )
+                        )
+                    elif isinstance(o, str):
+                        operands.append(Operand(name=o, attributes={}))
+            
+            if not operands:
+                operands = [Operand(name="operand", attributes={})]
+                
+            op_attrs = item.get("operation_attributes")
+            if not isinstance(op_attrs, dict):
+                op_attrs = {}
+                
             slots.append(SlotValues(operation, bug_cause, operands, op_attrs))
         return slots
 

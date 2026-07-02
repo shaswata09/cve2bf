@@ -42,7 +42,27 @@ class VLLMClient:
                 headers=self._headers(),
                 timeout=min(self._timeout, 5.0),
             )
-            return resp.status_code == 200
+            if resp.status_code != 200:
+                return False
+
+            try:
+                data = resp.json().get("data", [])
+                ids = {m["id"] for m in data}
+                if self._model not in ids:
+                    resolved = False
+                    for m in data:
+                        if m.get("root") == self._model:
+                            logger.info("Resolved configured model '%s' to served ID '%s'", self._model, m["id"])
+                            self._model = m["id"]
+                            resolved = True
+                            break
+                    if not resolved and len(data) == 1:
+                        logger.info("Using the single served model '%s' (configured: '%s')", data[0]["id"], self._model)
+                        self._model = data[0]["id"]
+            except Exception as e:
+                logger.warning("Failed to parse models payload for resolution: %s", e)
+
+            return True
         except httpx.HTTPError:
             return False
 
@@ -84,9 +104,12 @@ class VLLMClient:
             raise VLLMError(f"vLLM request failed: {exc}") from exc
 
         try:
-            content = resp.json()["choices"][0]["message"]["content"]
+            message = resp.json()["choices"][0]["message"]
+            content = message.get("content") or message.get("reasoning") or message.get("reasoning_content")
+            if content is None:
+                raise KeyError("No content or reasoning fields found in message")
             return json.loads(content)
-        except (KeyError, IndexError, json.JSONDecodeError) as exc:
+        except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
             raise VLLMError(f"Could not parse vLLM response: {exc}") from exc
 
     # -- internal -----------------------------------------------------------
