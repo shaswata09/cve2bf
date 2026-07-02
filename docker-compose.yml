@@ -1,0 +1,20 @@
+# Runs the CVE2BF platform. The vLLM server is expected to run separately
+# (it needs a GPU); point CVE2BF_VLLM_BASE_URL at it. On the same host you can
+# reach it via host.docker.internal.
+services:
+  cve2bf:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "9000:9000"
+    environment:
+      # Set to your vLLM endpoint; falls back to deterministic extraction if down.
+      CVE2BF_VLLM_BASE_URL: "http://host.docker.internal:8000/v1"
+      CVE2BF_VLLM_MODEL: "meta-llama/Llama-3.1-8B-Instruct"
+      CVE2BF_VLLM_FALLBACK_ENABLED: "true"
+      # Uncomment to run fully offline with bundled fixtures only:
+      # CVE2BF_OFFLINE_MODE: "true"
+      # CVE2BF_NVD_API_KEY: "your-key"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

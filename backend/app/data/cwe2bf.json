@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "source": "Derived from NIST CWE2BF mapping (SP 800-231). Maps a CWE id to candidate BF classes that may participate in the vulnerability chain.",
+  "mappings": {
+    "CWE-125": {"name": "Out-of-bounds Read", "bf_classes": ["DVR", "MAD", "MUS"], "typical_final_errors": ["Buffer Over-Read", "Buffer Under-Read"]},
+    "CWE-787": {"name": "Out-of-bounds Write", "bf_classes": ["DVR", "MAD", "MUS"], "typical_final_errors": ["Buffer Overflow", "Buffer Underflow"]},
+    "CWE-119": {"name": "Improper Restriction of Operations within the Bounds of a Memory Buffer", "bf_classes": ["DVR", "MAD", "MUS"], "typical_final_errors": ["Buffer Overflow", "Buffer Over-Read"]},
+    "CWE-120": {"name": "Buffer Copy without Checking Size of Input", "bf_classes": ["DVR", "MAD", "MUS"], "typical_final_errors": ["Buffer Overflow"]},
+    "CWE-121": {"name": "Stack-based Buffer Overflow", "bf_classes": ["DVR", "MAD", "MUS"], "typical_final_errors": ["Buffer Overflow"]},
+    "CWE-122": {"name": "Heap-based Buffer Overflow", "bf_classes": ["DVR", "MAD", "MUS"], "typical_final_errors": ["Buffer Overflow"]},
+    "CWE-124": {"name": "Buffer Underwrite", "bf_classes": ["DVR", "MAD", "MUS"], "typical_final_errors": ["Buffer Underflow"]},
+    "CWE-126": {"name": "Buffer Over-read", "bf_classes": ["DVR", "MAD", "MUS"], "typical_final_errors": ["Buffer Over-Read"]},
+    "CWE-127": {"name": "Buffer Under-read", "bf_classes": ["DVR", "MAD", "MUS"], "typical_final_errors": ["Buffer Under-Read"]},
+    "CWE-416": {"name": "Use After Free", "bf_classes": ["MMN", "MAD", "MUS"], "typical_final_errors": ["Use After Deallocate"]},
+    "CWE-415": {"name": "Double Free", "bf_classes": ["MMN"], "typical_final_errors": ["Object Corruption"]},
+    "CWE-476": {"name": "NULL Pointer Dereference", "bf_classes": ["MAD", "MUS"], "typical_final_errors": ["Object Corruption"]},
+    "CWE-190": {"name": "Integer Overflow or Wraparound", "bf_classes": ["TCM", "MMN", "MUS"], "typical_final_errors": ["Buffer Overflow"]},
+    "CWE-191": {"name": "Integer Underflow", "bf_classes": ["TCM", "MMN", "MUS"], "typical_final_errors": ["Buffer Overflow"]},
+    "CWE-457": {"name": "Use of Uninitialized Variable", "bf_classes": ["MMN", "MUS"], "typical_final_errors": ["Uninitialized Object"]},
+    "CWE-843": {"name": "Type Confusion", "bf_classes": ["TCV", "MUS"], "typical_final_errors": ["Type Confusion"]},
+    "CWE-129": {"name": "Improper Validation of Array Index", "bf_classes": ["DVR", "MAD", "MUS"], "typical_final_errors": ["Buffer Over-Read", "Buffer Overflow"]},
+    "CWE-20": {"name": "Improper Input Validation", "bf_classes": ["DVL", "DVR", "MAD", "MUS"], "typical_final_errors": ["Buffer Over-Read", "Buffer Overflow"]},
+    "CWE-908": {"name": "Use of Uninitialized Resource", "bf_classes": ["MMN", "MUS"], "typical_final_errors": ["Uninitialized Object", "Not Cleared Object"]}
+  },
+  "default": {
+    "name": "Unmapped CWE",
+    "bf_classes": ["DVR", "MAD", "MUS"],
+    "typical_final_errors": ["Buffer Over-Read", "Buffer Overflow"]
+  }
+}

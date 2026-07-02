@@ -1,0 +1,126 @@
+/* BF Tool styling — light, form-dense, close to the reference screenshot. */
+:root {
+  --bg: #fafafa;
+  --panel: #ffffff;
+  --border: #c9c9c9;
+  --label: #1a3e8c;         /* BF blue section labels */
+  --accent: #1a3e8c;
+  --highlight: #d9d9d9;      /* selected list item */
+  --text: #222;
+  --muted: #666;
+  --ok: #1a7f37;
+  --warn: #9a6700;
+  --err: #b42318;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.app-header { text-align: center; padding: 12px 16px 4px; }
+.app-header h1 { font-size: 18px; font-weight: 600; margin: 0; }
+.subtitle { color: var(--accent); margin: 2px 0 8px; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  margin: 8px;
+}
+
+h2 { font-size: 13px; color: var(--label); margin: 0 0 6px; }
+h3 { font-size: 13px; color: var(--label); margin: 0 0 8px; }
+h4 { font-size: 12px; color: var(--label); margin: 0 0 4px; }
+
+/* CVE panel ---------------------------------------------------------- */
+.cve-controls { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.field { display: flex; flex-direction: column; gap: 2px; }
+.field > span { font-size: 11px; color: var(--muted); }
+.field input, .field output {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 5px 6px;
+  background: #fff;
+  min-height: 26px;
+  min-width: 120px;
+}
+.field.wide { flex: 1 1 100%; }
+.field.wide output { min-height: 48px; white-space: pre-wrap; }
+
+.cve-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+.cve-meta .field output { min-width: 90px; }
+
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-size: 13px;
+}
+button.primary:disabled { opacity: 0.6; cursor: progress; }
+
+.status { font-size: 12px; }
+.status.ok { color: var(--ok); }
+.status.warn { color: var(--warn); }
+.status.err { color: var(--err); }
+
+/* Workspace ---------------------------------------------------------- */
+.workspace { display: flex; align-items: flex-start; }
+.chain-panel { flex: 0 0 150px; }
+.weaknesses { display: flex; gap: 8px; overflow-x: auto; flex: 1; padding: 0 8px 8px 0; }
+
+.chain-list { list-style: none; margin: 0 0 12px; padding: 0; }
+.chain-list li {
+  border: 1px solid var(--border);
+  padding: 4px 6px;
+  margin-bottom: -1px;
+  background: #fff;
+}
+.chain-list li.active { background: var(--highlight); font-weight: 600; }
+.failure-list li.active { background: #f6d9d5; }
+
+/* Weakness panels ---------------------------------------------------- */
+.weakness { flex: 0 0 300px; }
+.weakness-title { border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.weakness-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.col { min-width: 0; }
+.value {
+  border: 1px solid var(--border);
+  background: #f4f4f4;
+  padding: 5px 6px;
+  border-radius: 3px;
+  word-break: break-word;
+}
+.value.highlight { background: var(--highlight); font-weight: 600; }
+
+.operands, .attrs { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.kv { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px dotted var(--border); padding: 2px 0; }
+.kv .k { color: var(--muted); }
+.operand-name { font-family: "Consolas", monospace; font-size: 12px; }
+
+/* Generated description + trace -------------------------------------- */
+.generated-desc {
+  display: block;
+  border: 1px solid var(--border);
+  background: #fff;
+  padding: 10px;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+.trace { margin-top: 10px; }
+.trace summary { cursor: pointer; color: var(--accent); }
+.trace table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+.trace th, .trace td { border: 1px solid var(--border); padding: 4px 6px; text-align: left; }
+.extraction-meta { color: var(--muted); font-size: 12px; }
+
+.app-footer { color: var(--muted); font-size: 11px; padding: 8px 16px 24px; }

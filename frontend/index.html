@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bugs Framework (BF): BF Tool APP for Formal Specification of Security Vulnerabilities</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Bugs Framework (BF): BF Tool APP for Formal Specification of Security Vulnerabilities</h1>
+    <p class="subtitle">Deterministic CVE &rarr; BF chain generation</p>
+  </header>
+
+  <!-- CVE input + metadata -->
+  <section class="panel cve-panel">
+    <div class="cve-controls">
+      <label class="field">
+        <span>CVE ID</span>
+        <input id="cve-input" type="text" placeholder="CVE-2014-0160" value="CVE-2014-0160" />
+      </label>
+      <button id="analyze-btn" class="primary">Generate BF Chain</button>
+      <span id="status" class="status" role="status" aria-live="polite"></span>
+    </div>
+
+    <div class="cve-meta">
+      <div class="field"><span>CVSS</span><output id="meta-cvss">&mdash;</output></div>
+      <div class="field"><span>Severity</span><output id="meta-severity">&mdash;</output></div>
+      <div class="field"><span>Vendor/Product</span><output id="meta-vendor">&mdash;</output></div>
+      <div class="field"><span>CWE(s)</span><output id="meta-cwe">&mdash;</output></div>
+      <div class="field wide"><span>Description</span><output id="meta-desc">&mdash;</output></div>
+    </div>
+  </section>
+
+  <div class="workspace">
+    <!-- BF chain sidebar -->
+    <aside class="panel chain-panel">
+      <h2>BF Chain</h2>
+      <ul id="bf-chain" class="chain-list"></ul>
+      <h2>BF Failure(s)</h2>
+      <ul id="bf-failure" class="chain-list failure-list"></ul>
+    </aside>
+
+    <!-- Weakness panels rendered here -->
+    <main id="weaknesses" class="weaknesses"></main>
+  </div>
+
+  <!-- Generated description + provenance -->
+  <section class="panel">
+    <h2>Generated Description</h2>
+    <output id="generated-desc" class="generated-desc">&mdash;</output>
+    <details class="trace">
+      <summary>Pipeline trace &amp; provenance</summary>
+      <table id="trace-table"><thead><tr><th>Step</th><th>Status</th><th>Detail</th></tr></thead><tbody></tbody></table>
+      <p id="extraction-meta" class="extraction-meta"></p>
+    </details>
+  </section>
+
+  <footer class="app-footer">
+    <p>BF CITATION: Bojanova I. (2024) Bugs Framework (BF): Formalizing Cybersecurity Weaknesses and Vulnerabilities. NIST SP 800-231.</p>
+  </footer>
+
+  <template id="weakness-template">
+    <section class="panel weakness">
+      <h3 class="weakness-title"></h3>
+      <div class="weakness-grid">
+        <div class="col"><h4>BF Class</h4><div class="value class-value"></div></div>
+        <div class="col"><h4 class="cause-label">Bug/Fault</h4><div class="value cause-value"></div></div>
+        <div class="col"><h4>Operation</h4><div class="value op-value"></div></div>
+        <div class="col"><h4 class="cons-label">Error</h4><div class="value cons-value"></div></div>
+      </div>
+      <div class="operands"></div>
+      <div class="attrs"></div>
+    </section>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

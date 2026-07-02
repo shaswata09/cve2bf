@@ -1,0 +1,240 @@
+{
+  "version": "1.0.0",
+  "source": "NIST SP 800-231 (Bugs Framework). Encoded subset covering the _INP, _MEM and _DAT clusters.",
+  "clusters": {
+    "_INP": {
+      "title": "Input/Output Check Bugs",
+      "classes": ["DVL", "DVR"]
+    },
+    "_MEM": {
+      "title": "Memory Corruption/Disclosure Bugs",
+      "classes": ["MAD", "MMN", "MUS"]
+    },
+    "_DAT": {
+      "title": "Data Type Bugs",
+      "classes": ["DCL", "NRS", "TCV", "TCM"]
+    }
+  },
+  "classes": {
+    "DVL": {
+      "name": "Data Validation",
+      "cluster": "_INP",
+      "phase": "input-check",
+      "operations": ["Validate", "Sanitize"],
+      "causes": {
+        "bug": ["Missing Code", "Erroneous Code"],
+        "fault": ["Invalid Data", "Corrupted Policy Data"]
+      },
+      "consequences": {
+        "error": ["Invalid Data", "Wrong Value"],
+        "final_error": []
+      },
+      "operand_attributes": {
+        "Data State": ["Entered", "Stored", "In Use"]
+      },
+      "operation_attributes": {
+        "Mechanism": ["Value", "Quantity", "Range"],
+        "Source Code": ["Codebase", "Third-Party", "Standard Library"],
+        "Execution Space": ["Local", "Admin", "Bare-Metal", "Userland", "Kernel"]
+      }
+    },
+    "DVR": {
+      "name": "Data Verification",
+      "cluster": "_INP",
+      "phase": "input-check",
+      "operations": ["Verify", "Correct"],
+      "causes": {
+        "bug": ["Missing Code", "Erroneous Code"],
+        "fault": ["Invalid Data", "Under-Restrictive Policy", "Over-Restrictive Policy"]
+      },
+      "consequences": {
+        "error": ["Wrong Value", "Inconsistent Value", "Wrong Type"],
+        "final_error": []
+      },
+      "operand_attributes": {
+        "Data State": ["Entered", "Stored", "In Use"]
+      },
+      "operation_attributes": {
+        "Mechanism": ["Value", "Quantity", "Range"],
+        "Source Code": ["Codebase", "Third-Party", "Standard Library"],
+        "Execution Space": ["Local", "Admin", "Bare-Metal", "Userland", "Kernel"]
+      }
+    },
+    "MAD": {
+      "name": "Memory Addressing",
+      "cluster": "_MEM",
+      "phase": "memory-addressing",
+      "operations": ["Initialize Pointer", "Reposition", "Reassign", "Dereference"],
+      "causes": {
+        "bug": ["Missing Code", "Erroneous Code"],
+        "fault": ["Wrong Size", "Wrong Index", "Wrong Value", "Inconsistent Value", "NULL Pointer", "Wrong Type"]
+      },
+      "consequences": {
+        "error": ["Wild Pointer", "Dangling Pointer", "Untrusted Pointer", "Overbound Pointer", "Underbound Pointer", "Wrong Position Pointer", "Forbidden Address", "Hardcoded Address"],
+        "final_error": []
+      },
+      "operand_attributes": {
+        "Address Kind": ["Huge", "Moderate", "Little"],
+        "Address State": ["Stack", "Heap", "/other/"],
+        "Size Kind": ["Actual", "Used"]
+      },
+      "operation_attributes": {
+        "Mechanism": ["Direct", "Sequential"],
+        "Source Code": ["Codebase", "Third-Party", "Standard Library"],
+        "Execution Space": ["Local", "Admin", "Bare-Metal", "Userland", "Kernel"]
+      }
+    },
+    "MMN": {
+      "name": "Memory Management",
+      "cluster": "_MEM",
+      "phase": "memory-management",
+      "operations": ["Allocate", "Extend", "Reallocate", "Deallocate"],
+      "causes": {
+        "bug": ["Missing Code", "Erroneous Code"],
+        "fault": ["Wrong Size", "NULL Pointer", "Wrong Value", "Dangling Pointer"]
+      },
+      "consequences": {
+        "error": ["Not Enough Memory", "Memory Leak", "Double Deallocate", "Dangling Pointer", "Object Corruption"],
+        "final_error": ["Uninitialized Object", "Not Cleared Object"]
+      },
+      "operand_attributes": {
+        "Address State": ["Stack", "Heap", "/other/"],
+        "Size Kind": ["Actual", "Used"]
+      },
+      "operation_attributes": {
+        "Mechanism": ["Direct", "Sequential"],
+        "Source Code": ["Codebase", "Third-Party", "Standard Library"],
+        "Execution Space": ["Local", "Admin", "Bare-Metal", "Userland", "Kernel"]
+      }
+    },
+    "MUS": {
+      "name": "Memory Use",
+      "cluster": "_MEM",
+      "phase": "memory-use",
+      "operations": ["Initialize Object", "Read", "Write", "Clear", "Dereference"],
+      "causes": {
+        "bug": ["Missing Code", "Erroneous Code"],
+        "fault": ["Wild Pointer", "Dangling Pointer", "Untrusted Pointer", "Overbound Pointer", "Underbound Pointer", "Wrong Position Pointer", "NULL Pointer"]
+      },
+      "consequences": {
+        "error": [],
+        "final_error": ["Buffer Overflow", "Buffer Underflow", "Buffer Over-Read", "Buffer Under-Read", "Uninitialized Object", "Use After Deallocate", "Type Confusion", "Object Corruption"]
+      },
+      "operand_attributes": {
+        "Address Kind": ["Huge", "Moderate", "Little"],
+        "Address State": ["Stack", "Heap", "/other/"],
+        "Size Kind": ["Actual", "Used"]
+      },
+      "operation_attributes": {
+        "Mechanism": ["Direct", "Sequential"],
+        "Source Code": ["Codebase", "Third-Party", "Standard Library"],
+        "Execution Space": ["Local", "Admin", "Bare-Metal", "Userland", "Kernel"]
+      }
+    },
+    "DCL": {
+      "name": "Declaration",
+      "cluster": "_DAT",
+      "phase": "data-declaration",
+      "operations": ["Declare", "Define"],
+      "causes": {
+        "bug": ["Missing Code", "Erroneous Code"],
+        "fault": ["Wrong Type", "Wrong Value"]
+      },
+      "consequences": {
+        "error": ["Wrong Type", "Wrong Object Type"],
+        "final_error": []
+      },
+      "operand_attributes": {
+        "Data State": ["Entered", "Stored", "In Use"]
+      },
+      "operation_attributes": {
+        "Mechanism": ["Value", "Quantity", "Range"],
+        "Source Code": ["Codebase", "Third-Party", "Standard Library"],
+        "Execution Space": ["Local", "Admin", "Bare-Metal", "Userland", "Kernel"]
+      }
+    },
+    "NRS": {
+      "name": "Name Resolution",
+      "cluster": "_DAT",
+      "phase": "name-resolution",
+      "operations": ["Resolve", "Bind"],
+      "causes": {
+        "bug": ["Missing Code", "Erroneous Code"],
+        "fault": ["Wrong Type", "Wrong Object Type"]
+      },
+      "consequences": {
+        "error": ["Wrong Object Resolved", "Wrong Type"],
+        "final_error": []
+      },
+      "operand_attributes": {
+        "Data State": ["Entered", "Stored", "In Use"]
+      },
+      "operation_attributes": {
+        "Mechanism": ["Direct", "Sequential"],
+        "Source Code": ["Codebase", "Third-Party", "Standard Library"],
+        "Execution Space": ["Local", "Admin", "Bare-Metal", "Userland", "Kernel"]
+      }
+    },
+    "TCV": {
+      "name": "Type Conversion",
+      "cluster": "_DAT",
+      "phase": "type-conversion",
+      "operations": ["Cast", "Coerce"],
+      "causes": {
+        "bug": ["Missing Code", "Erroneous Code"],
+        "fault": ["Wrong Type", "Wrong Object Type", "Wrong Value"]
+      },
+      "consequences": {
+        "error": ["Wrong Type", "Truncated Value", "Wrong Value"],
+        "final_error": ["Type Confusion"]
+      },
+      "operand_attributes": {
+        "Data State": ["Entered", "Stored", "In Use"]
+      },
+      "operation_attributes": {
+        "Mechanism": ["Explicit", "Implicit"],
+        "Source Code": ["Codebase", "Third-Party", "Standard Library"],
+        "Execution Space": ["Local", "Admin", "Bare-Metal", "Userland", "Kernel"]
+      }
+    },
+    "TCM": {
+      "name": "Type Computation",
+      "cluster": "_DAT",
+      "phase": "type-computation",
+      "operations": ["Calculate", "Evaluate"],
+      "causes": {
+        "bug": ["Missing Code", "Erroneous Code"],
+        "fault": ["Wrong Type", "Wrong Value", "Truncated Value"]
+      },
+      "consequences": {
+        "error": ["Wrong Result", "Wrap Around", "Wrong Value"],
+        "final_error": []
+      },
+      "operand_attributes": {
+        "Data State": ["Entered", "Stored", "In Use"]
+      },
+      "operation_attributes": {
+        "Mechanism": ["Value", "Quantity", "Range"],
+        "Source Code": ["Codebase", "Third-Party", "Standard Library"],
+        "Execution Space": ["Local", "Admin", "Bare-Metal", "Userland", "Kernel"]
+      }
+    }
+  },
+  "failure_classes": {
+    "IEX": {"name": "Information Exposure", "impact": "confidentiality loss"},
+    "ACE": {"name": "Arbitrary Code Execution", "impact": "integrity loss"},
+    "DOS": {"name": "Denial of Service", "impact": "availability loss"},
+    "TPR": {"name": "Tampering", "impact": "integrity loss"}
+  },
+  "final_error_to_failure": {
+    "Buffer Over-Read": ["IEX", "DOS"],
+    "Buffer Under-Read": ["IEX", "DOS"],
+    "Buffer Overflow": ["ACE", "DOS", "TPR"],
+    "Buffer Underflow": ["ACE", "DOS", "TPR"],
+    "Use After Deallocate": ["ACE", "DOS"],
+    "Type Confusion": ["ACE", "DOS"],
+    "Object Corruption": ["TPR", "DOS"],
+    "Uninitialized Object": ["IEX", "DOS"],
+    "Not Cleared Object": ["IEX"]
+  }
+}
