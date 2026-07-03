@@ -3,76 +3,306 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bugs Framework (BF): BF Tool APP for Formal Specification of Security Vulnerabilities</title>
+  <title>Bugs Framework (BF) Explorer - CVE to Weakness Chain Visualizer</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Stylesheet -->
   <link rel="stylesheet" href="styles.css" />
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-  <header class="app-header">
-    <h1>Bugs Framework (BF): BF Tool APP for Formal Specification of Security Vulnerabilities</h1>
-    <p class="subtitle">Deterministic CVE &rarr; BF chain generation</p>
-  </header>
-
-  <!-- CVE input + metadata -->
-  <section class="panel cve-panel">
-    <div class="cve-controls">
-      <label class="field">
-        <span>CVE ID</span>
-        <input id="cve-input" type="text" placeholder="CVE-2014-0160" value="CVE-2014-0160" />
-      </label>
-      <button id="analyze-btn" class="primary">Generate BF Chain</button>
-      <span id="status" class="status" role="status" aria-live="polite"></span>
-    </div>
-
-    <div class="cve-meta">
-      <div class="field"><span>CVSS</span><output id="meta-cvss">&mdash;</output></div>
-      <div class="field"><span>Severity</span><output id="meta-severity">&mdash;</output></div>
-      <div class="field"><span>Vendor/Product</span><output id="meta-vendor">&mdash;</output></div>
-      <div class="field"><span>CWE(s)</span><output id="meta-cwe">&mdash;</output></div>
-      <div class="field wide"><span>Description</span><output id="meta-desc">&mdash;</output></div>
-    </div>
-  </section>
-
-  <div class="workspace">
-    <!-- BF chain sidebar -->
-    <aside class="panel chain-panel">
-      <h2>BF Chain</h2>
-      <ul id="bf-chain" class="chain-list"></ul>
-      <h2>BF Failure(s)</h2>
-      <ul id="bf-failure" class="chain-list failure-list"></ul>
-    </aside>
-
-    <!-- Weakness panels rendered here -->
-    <main id="weaknesses" class="weaknesses"></main>
+  <!-- Background glow effects -->
+  <div class="glow-bg">
+    <div class="glow-sphere glow-1"></div>
+    <div class="glow-sphere glow-2"></div>
   </div>
 
-  <!-- Generated description + provenance -->
-  <section class="panel">
-    <h2>Generated Description</h2>
-    <output id="generated-desc" class="generated-desc">&mdash;</output>
-    <details class="trace">
-      <summary>Pipeline trace &amp; provenance</summary>
-      <table id="trace-table"><thead><tr><th>Step</th><th>Status</th><th>Detail</th></tr></thead><tbody></tbody></table>
-      <p id="extraction-meta" class="extraction-meta"></p>
-    </details>
-  </section>
-
-  <footer class="app-footer">
-    <p>BF CITATION: Bojanova I. (2024) Bugs Framework (BF): Formalizing Cybersecurity Weaknesses and Vulnerabilities. NIST SP 800-231.</p>
-  </footer>
-
-  <template id="weakness-template">
-    <section class="panel weakness">
-      <h3 class="weakness-title"></h3>
-      <div class="weakness-grid">
-        <div class="col"><h4>BF Class</h4><div class="value class-value"></div></div>
-        <div class="col"><h4 class="cause-label">Bug/Fault</h4><div class="value cause-value"></div></div>
-        <div class="col"><h4>Operation</h4><div class="value op-value"></div></div>
-        <div class="col"><h4 class="cons-label">Error</h4><div class="value cons-value"></div></div>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-logo">
+        <i data-lucide="shield-alert" class="logo-icon"></i>
+        <div>
+          <h1>Bugs Framework (BF) Explorer</h1>
+          <p class="subtitle">NIST SP 800-231: Formal Specification of Security Vulnerabilities</p>
+        </div>
       </div>
-      <div class="operands"></div>
-      <div class="attrs"></div>
-    </section>
-  </template>
+      <div class="cve-search-bar">
+        <div class="search-input-wrapper">
+          <i data-lucide="search" class="search-icon"></i>
+          <input id="cve-input" type="text" placeholder="Enter CVE ID (e.g. CVE-2014-0160)" value="CVE-2014-0160" />
+        </div>
+        <button id="analyze-btn" class="primary-btn">
+          <span>Analyze & Map</span>
+          <i data-lucide="sparkles" class="btn-icon"></i>
+        </button>
+      </div>
+      <div id="status" class="status-indicator idle" role="status" aria-live="polite">Ready to analyze</div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <div class="main-workspace">
+      <!-- Left Column: Pipeline Steps Navigator -->
+      <aside class="pipeline-aside">
+        <div class="glass-panel sidebar-card">
+          <h2>Pipeline Stages</h2>
+          <div class="pipeline-steps">
+            <button class="step-item active" data-step="0">
+              <span class="step-status-dot pending"></span>
+              <div class="step-icon-box"><i data-lucide="download-cloud"></i></div>
+              <div class="step-details">
+                <span class="step-label">Stage 01</span>
+                <span class="step-title">Ingest CVE</span>
+              </div>
+            </button>
+            <button class="step-item" data-step="1">
+              <span class="step-status-dot pending"></span>
+              <div class="step-icon-box"><i data-lucide="git-fork"></i></div>
+              <div class="step-details">
+                <span class="step-label">Stage 02</span>
+                <span class="step-title">CWE Narrowing</span>
+              </div>
+            </button>
+            <button class="step-item" data-step="2">
+              <span class="step-status-dot pending"></span>
+              <div class="step-icon-box"><i data-lucide="network"></i></div>
+              <div class="step-details">
+                <span class="step-label">Stage 03</span>
+                <span class="step-title">Derive Skeletons</span>
+              </div>
+            </button>
+            <button class="step-item" data-step="3">
+              <span class="step-status-dot pending"></span>
+              <div class="step-icon-box"><i data-lucide="binary"></i></div>
+              <div class="step-details">
+                <span class="step-label">Stage 04</span>
+                <span class="step-title">LLM Solve & Verify</span>
+              </div>
+            </button>
+            <button class="step-item" data-step="4">
+              <span class="step-status-dot pending"></span>
+              <div class="step-icon-box"><i data-lucide="file-check"></i></div>
+              <div class="step-details">
+                <span class="step-label">Stage 05</span>
+                <span class="step-title">Final Specification</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Column: Detail Content Panels -->
+      <main class="content-main">
+        <!-- STEP 1: INGEST CVE -->
+        <section id="panel-step-0" class="step-panel active">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <div class="panel-num-badge">01</div>
+              <div>
+                <h2>Vulnerability Ingestion & Metadata</h2>
+                <p class="panel-desc">Retrieve and parse CVE records from the National Vulnerability Database (NVD).</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="step-grid grid-2">
+            <!-- Left Side: CVSS Gauge & Metadata -->
+            <div class="glass-panel flex-col gap-16">
+              <div class="cvss-gauge-wrapper">
+                <svg class="cvss-circle-svg" viewBox="0 0 120 120">
+                  <circle class="circle-bg" cx="60" cy="60" r="50"></circle>
+                  <circle id="cvss-circle-progress" class="circle-progress" cx="60" cy="60" r="50"></circle>
+                </svg>
+                <div class="cvss-score-text">
+                  <span id="meta-cvss" class="score-num">&mdash;</span>
+                  <span class="score-label">CVSS v3</span>
+                </div>
+              </div>
+
+              <div class="meta-grid">
+                <div class="meta-item">
+                  <span class="meta-lbl">Severity</span>
+                  <span id="meta-severity" class="meta-val badge">&mdash;</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-lbl">Vendor / Product</span>
+                  <span id="meta-vendor" class="meta-val">&mdash;</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-lbl">Associated CWE(s)</span>
+                  <div id="meta-cwe" class="meta-val tag-container">&mdash;</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side: Description Card -->
+            <div class="glass-panel flex-col gap-8">
+              <h3>Vulnerability Description</h3>
+              <p id="meta-desc" class="description-box">&mdash;</p>
+              <div id="offline-banner" class="info-alert hidden">
+                <i data-lucide="info" class="alert-icon"></i>
+                <span>Running in Offline Mode. Serving bundled local fixture.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2: CWE NARROWING -->
+        <section id="panel-step-1" class="step-panel">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <div class="panel-num-badge">02</div>
+              <div>
+                <h2>CWE to Bugs Framework Mapping</h2>
+                <p class="panel-desc">Aligning high-level CWE classification with fine-grained operational BF weakness classes.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-panel flex-col gap-16">
+            <div class="explain-card">
+              <p>Common Weakness Enumerations (CWE) group vulnerabilities abstractly. The Bugs Framework (BF) maps these to precise, operational classes representing specific types of code failures (e.g. data validation, memory addressing, data verification).</p>
+            </div>
+            
+            <div class="cwe-map-visualization">
+              <div class="vis-column cwe-side">
+                <h4>Source CWE(s)</h4>
+                <div id="narrowing-cwe-list" class="tag-container justify-center"></div>
+              </div>
+              <div class="vis-connector">
+                <div class="flow-line-dotted"></div>
+                <div class="map-badge">Maps To</div>
+              </div>
+              <div class="vis-column bf-side">
+                <h4>Candidate BF Weakness Classes</h4>
+                <div id="narrowing-bf-grid" class="bf-class-grid"></div>
+              </div>
+            </div>
+
+            <div id="narrowing-fallback-info" class="info-alert hidden">
+              <i data-lucide="help-circle" class="alert-icon"></i>
+              <span>No direct CWE mapping found. Triggered default fallback classes.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 3: DERIVE SKELETONS -->
+        <section id="panel-step-2" class="step-panel">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <div class="panel-num-badge">03</div>
+              <div>
+                <h2>Admissible Skeleton Chains</h2>
+                <p class="panel-desc">Deriving possible transition paths from entrypoint classes to the terminal failure.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-grid grid-1-2">
+            <!-- Explain Sidebar -->
+            <div class="glass-panel flex-col gap-12">
+              <h3>State Tree Logic</h3>
+              <p class="text-sm text-muted">Using the observed final failure impact (e.g., Information Exposure, Arbitrary Code Execution), a backward search in the BF state tree generates all admissible structural transition paths from the mapped candidate classes.</p>
+              <div class="stat-box">
+                <span id="skeletons-count" class="stat-num">0</span>
+                <span class="stat-lbl">Derived Paths</span>
+              </div>
+            </div>
+
+            <!-- Path List -->
+            <div class="glass-panel flex-col gap-12">
+              <h3>Admissible Chains</h3>
+              <div id="skeletons-list" class="skeletons-container"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 4: LLM SOLVE & VERIFY -->
+        <section id="panel-step-3" class="step-panel">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <div class="panel-num-badge">04</div>
+              <div>
+                <h2>Constraint-Guided Solve & Validation</h2>
+                <p class="panel-desc">Evaluating candidate chains using schema-constrained language model decoding and transition rule validation.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-panel flex-col gap-16">
+            <div class="explain-card">
+              <p>For each derived chain, the vLLM server fills class attributes (operations, operands, causes) under the guidance of a JSON Schema. The orchestrator tests the candidate against formal transition rules. The first chain satisfying all mathematical constraints is selected.</p>
+            </div>
+
+            <h3>Validation Sequence</h3>
+            <div id="attempts-list" class="attempts-container"></div>
+          </div>
+        </section>
+
+        <!-- STEP 5: FINAL SPECIFICATION -->
+        <section id="panel-step-4" class="step-panel">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <div class="panel-num-badge">05</div>
+              <div>
+                <h2>Formal Bugs Framework Chain</h2>
+                <p class="panel-desc">Visual and formal specifications of the validated weakness propagation sequence.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Security Analyst Report Card (Visible when strict validation fails) -->
+          <div id="analyst-report-card" class="glass-panel analyst-report hidden flex-col gap-12">
+            <div class="analyst-banner">
+              <i data-lucide="user-check" class="analyst-icon"></i>
+              <span>AI Security Analyst Manual Evaluation</span>
+            </div>
+            <p id="analyst-justification" class="analyst-justification-text"></p>
+          </div>
+
+          <!-- Chain Flow Graph Section -->
+          <div class="glass-panel flex-col gap-16 overflow-x">
+            <h3>Weakness Propagation Graph</h3>
+            <div id="chain-flow-graph" class="chain-graph-container">
+              <!-- Visual chain rendered here -->
+            </div>
+          </div>
+
+          <!-- Description and JSON outputs -->
+          <div class="step-grid grid-2 margin-top-16">
+            <!-- Narrative description -->
+            <div class="glass-panel flex-col gap-12">
+              <h3>Chain Narrative</h3>
+              <p id="generated-desc" class="narrative-box">&mdash;</p>
+            </div>
+
+            <!-- JSON Output -->
+            <div class="glass-panel flex-col gap-12">
+              <div class="flex-row justify-between align-center">
+                <h3>JSON Specification</h3>
+                <button id="copy-json-btn" class="icon-btn" title="Copy JSON">
+                  <i data-lucide="copy" class="btn-icon-sm"></i>
+                  <span>Copy</span>
+                </button>
+              </div>
+              <pre id="json-spec" class="code-block">&mdash;</pre>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>Bugs Framework (BF) Specification Platform | NIST SP 800-231 compliant.</p>
+        <p class="citation">Citation: Bojanova I. (2024) Bugs Framework (BF): Formalizing Cybersecurity Weaknesses and Vulnerabilities.</p>
+      </div>
+    </footer>
+  </div>
 
   <script src="app.js"></script>
 </body>

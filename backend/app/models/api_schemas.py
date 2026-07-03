@@ -59,6 +59,13 @@ class ExtractionMeta(BaseModel):
     model: Optional[str] = None
 
 
+class AnalystEvaluation(BaseModel):
+    """The AI security analyst's manual evaluation when formal validation fails."""
+
+    justification: str = Field(..., description="Explanation of why validation failed and the human analyst's interpretation.")
+    suggested_chain: list[str] = Field(default_factory=list, description="Expert-suggested weakness class sequence.")
+
+
 class AnalyzeResponse(BaseModel):
     """Response for ``POST /api/v1/analyze``."""
 
@@ -70,6 +77,7 @@ class AnalyzeResponse(BaseModel):
     review_reason: Optional[str] = None
     extraction: Optional[ExtractionMeta] = None
     trace: list[PipelineStepTrace] = Field(default_factory=list)
+    analyst_evaluation: Optional[AnalystEvaluation] = None
 
 
 class HealthResponse(BaseModel):

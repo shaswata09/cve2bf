@@ -98,6 +98,7 @@ class Orchestrator:
         extraction_meta: ExtractionMeta | None = None
 
         # Steps 3-5: try skeletons best-first until one validates.
+        failed_attempts_log = []
         for attempt, skeleton in enumerate(skeletons[:MAX_SKELETON_ATTEMPTS]):
             output = extractor.extract(skeleton, cve.description)
             extraction_meta = ExtractionMeta(source=output.source, model=output.model)
@@ -121,6 +122,12 @@ class Orchestrator:
                     extraction=extraction_meta,
                     trace=trace,
                 )
+            
+            failed_attempts_log.append({
+                "chain": " -> ".join(skeleton.class_sequence),
+                "errors": "; ".join(result.errors[:3])
+            })
+            
             trace.append(
                 PipelineStepTrace(
                     step="extract_validate",
@@ -129,18 +136,29 @@ class Orchestrator:
                 )
             )
 
+        analyst_eval = None
+        if hasattr(extractor, "evaluate_failure"):
+            eval_data = extractor.evaluate_failure(cve.description, failed_attempts_log)
+            from app.models.api_schemas import AnalystEvaluation
+            analyst_eval = AnalystEvaluation(
+                justification=eval_data.get("justification", ""),
+                suggested_chain=eval_data.get("suggested_chain", [])
+            )
+
         return self._review(
             cve,
             "No candidate chain passed validation; manual review required.",
             trace,
             extraction_meta,
+            analyst_eval,
         )
 
     # -- response helpers ---------------------------------------------------
-    def _review(self, cve, reason, trace, extraction=None) -> AnalyzeResponse:
+    def _review(self, cve, reason, trace, extraction=None, analyst_evaluation=None) -> AnalyzeResponse:
         return AnalyzeResponse(
             cve=cve, chain=None, valid=False, review_reason=reason,
             extraction=extraction, trace=trace,
+            analyst_evaluation=analyst_evaluation,
         )
 
     def _not_found(self, cve_id, detail, trace) -> AnalyzeResponse:

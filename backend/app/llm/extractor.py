@@ -93,6 +93,13 @@ class DeterministicExtractor:
     def _default_operation_attrs(self, cls) -> dict[str, str]:
         return {name: values[0] for name, values in cls.operation_attributes.items()}
 
+    def evaluate_failure(self, cve_text: str, failed_attempts: list[dict]) -> dict:
+        """Heuristic fallback for when validation fails."""
+        return {
+            "justification": "Heuristic analysis failed to find a valid weakness chain satisfying all taxonomic rules.",
+            "suggested_chain": []
+        }
+
 
 class VLLMExtractor:
     """Primary extractor backed by a vLLM server with guided decoding."""
@@ -153,6 +160,53 @@ class VLLMExtractor:
                 
             slots.append(SlotValues(operation, bug_cause, operands, op_attrs))
         return slots
+
+    def evaluate_failure(self, cve_text: str, failed_attempts: list[dict]) -> dict:
+        """Call the model to generate a human analyst explanation of validation failure."""
+        system_prompt = (
+            "You are a senior Human Security Analyst expert in the NIST Bugs Framework (BF). "
+            "Your job is to review a vulnerability and explain why the formal validation constraints "
+            "could not be satisfied by the automatic pipeline, and provide your expert manual interpretation."
+        )
+        
+        attempts_summary = ""
+        for i, att in enumerate(failed_attempts):
+            attempts_summary += f"- Attempt {i+1} (Chain: {att.get('chain')}): {att.get('errors')}\n"
+            
+        user_prompt = (
+            f"CVE Description:\n{cve_text}\n\n"
+            f"Formal validation attempts that failed:\n{attempts_summary}\n"
+            "Please provide a JSON object with two fields:\n"
+            "1. 'justification': A detailed, professional explanation (2-3 sentences) of why the strict transition rules "
+            "failed (e.g., semantic ambiguity in the description, class boundary mismatches) and your expert human "
+            "interpretation of the vulnerability chain.\n"
+            "2. 'suggested_chain': A list of the most plausible BF class codes in order (e.g. ['MUS', 'DVR'])."
+        )
+        
+        schema = {
+            "type": "object",
+            "properties": {
+                "justification": {
+                    "type": "string",
+                    "description": "Expert justification for the validation failure and interpretation."
+                },
+                "suggested_chain": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Plausible sequence of BF class codes."
+                }
+            },
+            "required": ["justification", "suggested_chain"]
+        }
+        
+        try:
+            return self._client.extract_json(system_prompt, user_prompt, schema)
+        except Exception as e:
+            logger.warning("Failed to generate analyst evaluation: %s", e)
+            return {
+                "justification": f"Strict formal validation failed. The description does not map neatly to valid state transitions: {e}",
+                "suggested_chain": []
+            }
 
 
 def build_extractor(settings: Settings, taxonomy: Taxonomy) -> tuple[object, bool]:
